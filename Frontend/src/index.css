@@ -76,3 +76,16 @@ html {
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 40px 10px rgba(129, 140, 248, 0.4),
+                0 0 80px 20px rgba(236, 72, 153, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 60px 20px rgba(236, 72, 153, 0.5),
+                0 0 120px 30px rgba(129, 140, 248, 0.5);
+  }
+}
+.glow-animate {
+  animation: glowPulse 3s ease-in-out infinite;
+}
