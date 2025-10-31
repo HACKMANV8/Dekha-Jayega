@@ -1,0 +1,33 @@
+{
+  "concept": {
+    "title": "Clockwork Enigma",
+    "genre": "Steampunk Detective RPG",
+    "elevator_pitch": "Unravel intricate mysteries in a smog-choked Victorian London powered by gears and steam. Play as a brilliant detective augmented with clockwork enhancements, solving crimes that blend logic, gadgetry, and a touch of the arcane.",
+    "core_loop": "*   Receive a new case from Scotland Yard or a private client.\n*   Investigate crime scenes, gather clues, and interview witnesses.\n*   Analyze evidence using clockwork gadgets and deduction skills.\n*   Interrogate suspects, using your wit and technological enhancements to uncover lies.\n*   Solve the mystery, expose the culprit, and earn rewards and reputation.",
+    "key_mechanics": "*   **Clockwork Augmentations:** Enhance your detective abilities with steampunk gadgets (e.g., enhanced vision, lie detection).\n*   **Deduction System:** Connect clues on a mind map to form hypotheses and draw conclusions.\n*   **Gadget Crafting:** Create and upgrade your clockwork tools using scavenged parts and blueprints.\n*   **Social Investigation:** Navigate social circles, build relationships, and gather information from informants.\n*   **Branching Narrative:** Choices and investigation outcomes impact the story and character relationships.",
+    "progression": "*   **Detective Rank:** Increase your rank by solving cases, unlocking new abilities and gadgets.\n*   **Gadget Upgrades:** Improve your clockwork tools to enhance their effectiveness.\n*   **Relationship System:** Build trust and rapport with key characters to gain access to valuable information.\n*   **Story Progression:** Unravel a larger conspiracy as you solve individual cases.\n*   **Difficulty:** Cases become more complex and challenging as you progress.",
+    "world_setting": "Victorian London, but with advanced clockwork technology permeating every aspect of life. Steampunk aesthetics blend with gothic architecture, creating a smog-choked, gear-driven metropolis. Secret societies and powerful inventors vie for control in the shadows.",
+    "art_style": "A blend of realistic Victorian architecture and exaggerated steampunk designs. Character designs emphasize intricate clockwork augmentations and stylish attire. Color palette leans towards muted tones with pops of brass, copper, and glowing energy sources.",
+    "target_audience": "Fans of detective games, RPGs, and steampunk settings. Players who enjoy puzzle-solving, investigation, and character-driven narratives. Platforms: PC, Consoles.",
+    "monetization": "Premium model with optional cosmetic DLC (e.g., alternate outfits, gadget skins).",
+    "usp": "A unique blend of detective gameplay, steampunk setting, and RPG progression. The clockwork augmentation system allows for creative problem-solving and customization, offering a fresh take on the detective genre."
+  },
+  "world_lore": {
+    "world_name": "Aethelburg: Clockwork Enigma",
+    "geography": "Aethelburg is bisected by the perpetually smog-choked River Thames. The *Opulent West End*, a showcase of gleaming clockwork architecture and Aetherium-powered marvels, contrasts sharply with the *Grimy East End*, a labyrinthine district of cobbled streets and towering tenements where the working class toils in factories and workshops. Beneath the city lies the *Clockwork Sewers*, a vast network of tunnels and pipes now inhabited by scavengers, rogue automatons, and forgotten experiments. The city is surrounded by the polluted remnants of once-verdant farmlands, now dotted with Aetherium mines.",
+    "social_structures": "A rigid class system divides Aethelburg society. The wealthy elite control the government and industries, while the working class toils in factories and workshops. Automatons, though increasingly integrated into society, are denied basic rights and face widespread discrimination. The Automaton Rights movement, led by charismatic activists, seeks to challenge this inequality and secure equal rights for all sentient machines. Gilded automatons are status symbols, while the working class often must 'rent' automatons to help them with tasks, further entrenching class divides."
+  },
+  "factions": [
+    {
+      "faction_type": "Scientific Guild/Imperial Authority",
+      "_id": "6904eb28acab51bc4e11283e"
+    },
+    {
+      "faction_type": "Technocratic Collective",
+      "_id": "6904eb28acab51bc4e11283f"
+    }
+  ],
+  "characters": [],
+  "plot_arcs": [],
+  "questlines": []
+}

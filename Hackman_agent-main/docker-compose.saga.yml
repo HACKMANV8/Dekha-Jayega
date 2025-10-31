@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  saga-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.saga
+    container_name: sagaengine-api
+    ports:
+      - "8001:8001"
+    environment:
+      # API Configuration
+      - API_HOST=0.0.0.0
+      - API_PORT=8001
+      
+      # LLM API Keys (set these in .env file or here)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      
+      # Model Configuration
+      - SUPERVISOR_MODEL=${SUPERVISOR_MODEL:-gemini-2.0-flash}
+      - MODEL=${MODEL:-gemini-2.0-flash}
+      - MODEL_TEMPERATURE=${MODEL_TEMPERATURE:-0.7}
+      
+      # Parallel Execution
+      - PARALLEL_EXECUTION=${PARALLEL_EXECUTION:-true}
+      - PARALLEL_MAX_WORKERS=${PARALLEL_MAX_WORKERS:-3}
+      - PARALLEL_BATCH_SIZE=${PARALLEL_BATCH_SIZE:-4}
+      - PARALLEL_RETRY_SEQUENTIAL=${PARALLEL_RETRY_SEQUENTIAL:-true}
+      
+      # Export Configuration
+      - EXPORT_DIR=/app/exports
+      - CHECKPOINT_DB_PATH=/app/checkpoints/checkpoints.db
+      
+    volumes:
+      # Mount exports directory
+      - ./SagaAgent/exports:/app/exports
+      # Mount checkpoints directory
+      - ./SagaAgent/checkpoints:/app/checkpoints
+      # Mount source code for development (optional)
+      # - .:/app
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Redis for session caching
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: sagaengine-redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   restart: unless-stopped
+
+# volumes:
+#   redis-data:
+
+

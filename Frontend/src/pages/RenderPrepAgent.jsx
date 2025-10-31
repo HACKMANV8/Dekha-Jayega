@@ -1,35 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import {
   TextIcon,
   ImageIcon,
   VideoIcon,
   MapIcon,
-  CheckIcon,
-  SendIcon,
+  Loader2,
+  AlertCircle,
+  Download,
+  Eye,
+  Sparkles,
+  CheckCircle,
 } from "lucide-react";
-// --- INLINE SVG ICONS ---
 
-// Regenerate Icon
-const RefreshIcon = (props) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    {...props}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0 0v4.992m0 0h-4.992"
-    />
-  </svg>
-);
+const API_BASE_URL = "http://localhost:4000/api";
 
 const RenderPrepAgent = () => {
   const [activeTab, setActiveTab] = useState("Prompt Preview");
+  const [sagaSessions, setSagaSessions] = useState([]);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [assets, setAssets] = useState([]);
+  const [generatingImages, setGeneratingImages] = useState(false);
+  const [qualityPreset, setQualityPreset] = useState("standard");
 
   const tabs = [
     { name: "Prompt Preview", icon: TextIcon },
@@ -37,6 +31,467 @@ const RenderPrepAgent = () => {
     { name: "Video Storyboarding", icon: VideoIcon },
     { name: "World Layout", icon: MapIcon },
   ];
+
+  // Fetch saga sessions on component mount and restore previous session
+  useEffect(() => {
+    fetchSagaSessions();
+
+    // Restore previously selected session from localStorage
+    const savedSessionId = localStorage.getItem("renderPrepSelectedSession");
+    console.log("[RenderPrep] Checking for saved session ID:", savedSessionId);
+    if (savedSessionId) {
+      console.log(
+        "[RenderPrep] Found saved session, will restore after sessions load"
+      );
+      // Fetch assets for the saved session
+      fetchAssetsForSession(savedSessionId);
+    } else {
+      console.log("[RenderPrep] No saved session found in localStorage");
+    }
+  }, []);
+
+  // Fetch assets when session changes
+  useEffect(() => {
+    if (selectedSession) {
+      // Save selected session to localStorage
+      localStorage.setItem("renderPrepSelectedSession", selectedSession._id);
+      // Fetch existing assets for this session
+      fetchAssetsForSession(selectedSession._id);
+    }
+  }, [selectedSession]);
+
+  const fetchSagaSessions = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`${API_BASE_URL}/saga-agent/sessions`);
+      const data = await response.json();
+
+      if (data.success) {
+        console.log("Fetched sessions:", data.data);
+        // Show all sessions (not just completed ones)
+        // Filter for sessions that have reached at least the concept stage
+        const validSessions = data.data.filter(
+          (session) =>
+            session.concept && Object.keys(session.concept).length > 0
+        );
+        setSagaSessions(validSessions);
+
+        // Restore selected session if it exists
+        const savedSessionId = localStorage.getItem(
+          "renderPrepSelectedSession"
+        );
+        if (savedSessionId) {
+          const savedSession = validSessions.find(
+            (s) => s._id === savedSessionId
+          );
+          if (savedSession) {
+            setSelectedSession(savedSession);
+          }
+        }
+
+        if (validSessions.length === 0) {
+          setError(
+            "No saga sessions found. Please create a saga workflow first in the Agents page."
+          );
+        }
+      } else {
+        setError(data.message || "Failed to fetch saga sessions");
+      }
+    } catch (err) {
+      setError("Failed to fetch saga sessions: " + err.message);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAssetsForSession = async (sessionId) => {
+    try {
+      console.log(
+        "[fetchAssetsForSession] Fetching assets for session:",
+        sessionId
+      );
+      const response = await fetch(
+        `${API_BASE_URL}/render-prep/assets/${sessionId}`
+      );
+      const data = await response.json();
+
+      if (data.success && data.data.length > 0) {
+        console.log("[fetchAssetsForSession] Loaded assets:", data.data);
+        // Transform assets to match frontend format
+        const transformedAssets = data.data.map((asset) => ({
+          id: asset._id,
+          name: asset.name,
+          type: asset.type,
+          prompt: asset.prompts?.detailed || asset.prompt || "",
+          imageUrl: asset.url,
+          status: asset.status,
+          metadata: asset.metadata,
+        }));
+        setAssets(transformedAssets);
+        console.log(
+          "[fetchAssetsForSession] Transformed assets:",
+          transformedAssets
+        );
+      } else {
+        console.log("[fetchAssetsForSession] No assets found for session");
+        setAssets([]);
+      }
+    } catch (err) {
+      console.error("[fetchAssetsForSession] Failed to fetch assets:", err);
+      // Don't show error to user, just log it
+      setAssets([]);
+    }
+  };
+
+  const generatePrompts = async () => {
+    if (!selectedSession) {
+      setError("Please select a saga session first");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(
+        `${API_BASE_URL}/render-prep/generate-prompts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sessionId: selectedSession._id,
+            qualityPreset,
+            generateImages: false,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Backend now returns assets with all fields including _id/id
+        const transformedAssets = data.data.assets.map((asset) => ({
+          id: asset._id || asset.id,
+          name: asset.name,
+          type: asset.type,
+          prompt: asset.prompt,
+          imageUrl: asset.url,
+          status: asset.status,
+          metadata: asset.metadata,
+        }));
+        setAssets(transformedAssets);
+        // Switch to Image Generation tab
+        setActiveTab("Image Generation");
+        setActiveTab("Image Generation");
+      } else {
+        setError(data.message || "Failed to generate prompts");
+      }
+    } catch (err) {
+      setError("Failed to generate prompts: " + err.message);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateSingleImage = async (assetId) => {
+    try {
+      console.log("[generateSingleImage] Starting for assetId:", assetId);
+      console.log(
+        "[generateSingleImage] URL:",
+        `${API_BASE_URL}/render-prep/generate-image/${assetId}`
+      );
+
+      const response = await fetch(
+        `${API_BASE_URL}/render-prep/generate-image/${assetId}`,
+        {
+          method: "POST",
+        }
+      );
+
+      console.log("[generateSingleImage] Response status:", response.status);
+      const data = await response.json();
+      console.log("[generateSingleImage] Response data:", data);
+      console.log("[generateSingleImage] data.data:", data.data);
+
+      if (data.success) {
+        const imageUrl = data.data.imageUrl || data.data.url;
+        console.log("[generateSingleImage] Success! Image URL:", imageUrl);
+
+        if (!imageUrl) {
+          console.error("[generateSingleImage] No imageUrl found in response!");
+          throw new Error("No image URL returned from server");
+        }
+
+        // Update the asset in the list
+        setAssets((prev) => {
+          const updated = prev.map((asset) =>
+            asset.id === assetId
+              ? { ...asset, imageUrl: imageUrl, status: "completed" }
+              : asset
+          );
+          console.log("[generateSingleImage] Updated assets:", updated);
+          return updated;
+        });
+      } else {
+        console.error(
+          "[generateSingleImage] API returned success=false:",
+          data.message
+        );
+        throw new Error(data.message);
+      }
+    } catch (err) {
+      console.error("[generateSingleImage] Failed to generate image:", err);
+      throw err;
+    }
+  };
+
+  const generateAllImages = async () => {
+    try {
+      setGeneratingImages(true);
+      setError(null);
+
+      const assetIds = assets.map((asset) => asset.id);
+
+      const response = await fetch(
+        `${API_BASE_URL}/render-prep/batch-generate-images`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ assetIds }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Refresh assets to show generated images
+        if (selectedSession) {
+          const assetsResponse = await fetch(
+            `${API_BASE_URL}/render-prep/assets/${selectedSession.projectId}`
+          );
+          const assetsData = await assetsResponse.json();
+          if (assetsData.success) {
+            const sessionAssets = assetsData.data.filter(
+              (asset) => asset.projectId === selectedSession.projectId
+            );
+            setAssets(
+              sessionAssets.map((a) => ({
+                id: a._id,
+                name: a.name,
+                type: a.type,
+                prompt: a.prompts.detailed,
+                imageUrl: a.url,
+                status: a.status,
+              }))
+            );
+          }
+        }
+      } else {
+        setError(data.message || "Failed to generate images");
+      }
+    } catch (err) {
+      setError("Failed to generate images: " + err.message);
+      console.error(err);
+    } finally {
+      setGeneratingImages(false);
+    }
+  };
+
+  const PromptPreviewTab = () => (
+    <div className="space-y-6">
+      {/* Saga Selection */}
+      <div className="bg-gray-900/50 border border-purple-500/30 rounded-lg p-6">
+        <h3 className="text-xl font-semibold mb-4 text-purple-400">
+          Select Saga Session
+        </h3>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Available Saga Sessions ({sagaSessions.length})
+            </label>
+            <select
+              value={selectedSession?._id || ""}
+              onChange={(e) => {
+                const session = sagaSessions.find(
+                  (s) => s._id === e.target.value
+                );
+                setSelectedSession(session);
+              }}
+              className="w-full px-4 py-2 bg-gray-800 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-purple-400"
+            >
+              <option value="">Choose a saga session...</option>
+              {sagaSessions.map((session) => (
+                <option key={session._id} value={session._id}>
+                  {session.topic} ({session.currentStage} - {session.status}) -{" "}
+                  {new Date(session.createdAt).toLocaleDateString()}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Quality Preset
+            </label>
+            <select
+              value={qualityPreset}
+              onChange={(e) => setQualityPreset(e.target.value)}
+              className="w-full px-4 py-2 bg-gray-800 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-purple-400"
+            >
+              <option value="draft">Draft</option>
+              <option value="standard">Standard</option>
+              <option value="high">High Quality</option>
+              <option value="cinematic">Cinematic</option>
+            </select>
+          </div>
+
+          <button
+            onClick={generatePrompts}
+            disabled={loading || !selectedSession}
+            className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Generating Prompts...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5" />
+                Generate Prompts
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Session Preview */}
+      {selectedSession && (
+        <div className="bg-gray-900/50 border border-purple-500/30 rounded-lg p-6">
+          <h3 className="text-xl font-semibold mb-4 text-purple-400">
+            Session Details
+          </h3>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="text-gray-400">Topic:</span>
+              <p className="text-white font-medium">{selectedSession.topic}</p>
+            </div>
+            <div>
+              <span className="text-gray-400">Stage:</span>
+              <p className="text-white font-medium">
+                {selectedSession.currentStage}
+              </p>
+            </div>
+            <div>
+              <span className="text-gray-400">Characters:</span>
+              <p className="text-white font-medium">
+                {selectedSession.characters?.length || 0}
+              </p>
+            </div>
+            <div>
+              <span className="text-gray-400">Factions:</span>
+              <p className="text-white font-medium">
+                {selectedSession.factions?.length || 0}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-red-300">{error}</p>
+        </div>
+      )}
+    </div>
+  );
+
+  const ImageGenerationTab = () => (
+    <div className="space-y-6">
+      {/* Generate All Button */}
+      {assets.length > 0 && (
+        <div className="bg-gray-900/50 border border-purple-500/30 rounded-lg p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-semibold text-purple-400">
+                Batch Image Generation
+              </h3>
+              <p className="text-gray-400 text-sm mt-1">
+                Generate images for all {assets.length} prompts using Nano
+                Banana
+              </p>
+            </div>
+            <button
+              onClick={generateAllImages}
+              disabled={generatingImages}
+              className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center gap-2"
+            >
+              {generatingImages ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <ImageIcon className="w-5 h-5" />
+                  Generate All Images
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Assets Grid */}
+      {assets.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {assets.map((asset) => (
+            <AssetCard
+              key={asset.id}
+              asset={asset}
+              onGenerate={generateSingleImage}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-gray-900/50 border border-purple-500/30 rounded-lg p-12 text-center">
+          <ImageIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-400">
+            No prompts generated yet. Go to Prompt Preview tab to generate
+            prompts first.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+
+  const VideoStoryboardingTab = () => (
+    <div className="bg-gray-900/50 border border-purple-500/30 rounded-lg p-12 text-center">
+      <VideoIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+      <h3 className="text-xl font-semibold text-gray-300 mb-2">
+        Video Storyboarding
+      </h3>
+      <p className="text-gray-400">Coming soon...</p>
+    </div>
+  );
+
+  const WorldLayoutTab = () => (
+    <div className="bg-gray-900/50 border border-purple-500/30 rounded-lg p-12 text-center">
+      <MapIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+      <h3 className="text-xl font-semibold text-gray-300 mb-2">World Layout</h3>
+      <p className="text-gray-400">Coming soon...</p>
+    </div>
+  );
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -56,9 +511,8 @@ const RenderPrepAgent = () => {
   return (
     <>
       <Navbar />
-      {/* Main container with Hero styling */}
       <div className="min-h-screen bg-[#050505] text-white relative overflow-hidden">
-        {/* Background glow (Copied from HeroSection) */}
+        {/* Background glow */}
         <div
           className="hero-glow absolute inset-0 z-0 scale-100 opacity-60 transition-all duration-700 
                        bg-[radial-gradient(circle_at_center,rgba(130,75,255,0.4)_0%,rgba(10,10,10,1)_80%)] 
@@ -72,7 +526,7 @@ const RenderPrepAgent = () => {
             <h1 className="text-4xl font-bold text-white">
               RenderPrepAgent Interface
             </h1>
-            <p className="text-gray-300 text-sm">
+            <p className="text-gray-300 text-sm mt-2">
               Transform narrative elements into visual assets
             </p>
           </div>
@@ -104,366 +558,146 @@ const RenderPrepAgent = () => {
   );
 };
 
-// --- TAB COMPONENTS ---
+// Asset Card Component
+const AssetCard = ({ asset, onGenerate }) => {
+  const [generating, setGenerating] = useState(false);
+  const [showFullPrompt, setShowFullPrompt] = useState(false);
 
-const HITLControls = () => (
-  <div className="flex flex-wrap items-center gap-3 mt-6 p-4 bg-gray-900/60 backdrop-blur-md border border-purple-500/30 rounded-xl">
-    <span className="text-sm font-medium text-gray-300 mr-2">Actions:</span>
-    <button className="flex items-center gap-2 px-4 py-2 bg-green-600/80 text-white hover:bg-green-700 rounded-lg transition-colors text-sm font-medium">
-      <CheckIcon className="w-4 h-4" /> Approve
-    </button>
-    <button className="flex items-center gap-2 px-4 py-2 bg-yellow-600/80 text-white hover:bg-yellow-700 rounded-lg transition-colors text-sm font-medium">
-      <RefreshIcon className="w-4 h-4" /> Regenerate
-    </button>
-    <button className="flex items-center gap-2 px-4 py-2 bg-blue-600/80 text-white hover:bg-blue-700 rounded-lg transition-colors text-sm font-medium">
-      <SendIcon className="w-4 h-4" /> Send to Engine
-    </button>
-  </div>
-);
-
-const PromptPreviewTab = () => (
-  <div className="space-y-6">
-    <h2 className="text-2xl font-bold text-white mb-4">Prompt Preview</h2>
-    <div className="bg-gray-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl shadow-2xl p-6">
-      <h3 className="text-lg font-semibold text-purple-300 mb-3">
-        Character: 'Detective Harding'
-      </h3>
-      <pre className="text-gray-300 text-sm bg-gray-800/70 p-4 rounded-lg overflow-x-auto">
-        {`{
-  "entity": "Detective Harding",
-  "type": "character",
-  "description": "A weary, cynical detective in his late 40s, 1920s Chicago.",
-  "visual_style": "Film noir, high contrast lighting, gritty realism",
-  "prompt": "A close-up portrait of a 1920s detective, weary eyes, fedora casting a shadow, trench coat collar up, rain-slicked city street at night in the background, film noir style."
-}`}
-      </pre>
-    </div>
-    <div className="bg-gray-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl shadow-2xl p-6">
-      <h3 className="text-lg font-semibold text-purple-300 mb-3">
-        Environment: 'The Onyx Club'
-      </h3>
-      <pre className="text-gray-300 text-sm bg-gray-800/70 p-4 rounded-lg overflow-x-auto">
-        {`{
-  "entity": "The Onyx Club",
-  "type": "environment",
-  "description": "A smoky, opulent 1920s speakeasy, dimly lit, velvet curtains.",
-  "visual_style": "Art deco, opulent, dark, smoky atmosphere",
-  "prompt": "Wide interior shot of a 1920s speakeasy, 'The Onyx Club', art deco design, velvet booths, smoky atmosphere, dimly lit, jazz band on a small stage."
-}`}
-      </pre>
-    </div>
-    <HITLControls />
-  </div>
-);
-
-const ImageGenerationTab = () => {
-  const [prompt, setPrompt] = useState("");
-  const [aspectRatio, setAspectRatio] = useState("16:9");
-  const [stylePreset, setStylePreset] = useState("Film Noir");
-  const [negativePrompt, setNegativePrompt] = useState("");
-  const [generatedImage, setGeneratedImage] = useState(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState(null);
-  const [generationHistory, setGenerationHistory] = useState([]);
-
-  const handleGenerateImage = async () => {
-    if (!prompt.trim()) {
-      setError("Please enter a prompt");
-      return;
-    }
-
-    setIsGenerating(true);
-    setError(null);
-
+  const handleGenerate = async () => {
+    console.log("[AssetCard] Generate clicked for asset:", asset.id);
+    setGenerating(true);
     try {
-      const response = await fetch(
-        "http://localhost:4000/api/image-generation/generate",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            prompt,
-            aspectRatio,
-            stylePreset,
-            negativePrompt,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (data.success) {
-        setGeneratedImage(data.data);
-        // Add to history
-        setGenerationHistory((prev) => [data.data, ...prev].slice(0, 6));
-      } else {
-        setError(data.message || "Failed to generate image");
-      }
+      console.log("[AssetCard] Calling onGenerate...");
+      await onGenerate(asset.id);
+      console.log("[AssetCard] onGenerate completed successfully");
     } catch (err) {
-      setError(
-        "Failed to connect to server. Make sure the backend is running."
-      );
-      console.error("Error generating image:", err);
+      console.error("[AssetCard] Generation failed:", err);
+      console.error("[AssetCard] Error details:", {
+        message: err.message,
+        stack: err.stack,
+        name: err.name,
+      });
+      alert(`Failed to generate image: ${err.message}`);
     } finally {
-      setIsGenerating(false);
+      setGenerating(false);
+      console.log("[AssetCard] Generation process finished");
+    }
+  };
+
+  const getTypeColor = (type) => {
+    switch (type) {
+      case "character-concept":
+        return "text-green-400 border-green-500/30";
+      case "environment":
+        return "text-blue-400 border-blue-500/30";
+      case "prop":
+        return "text-amber-400 border-amber-500/30";
+      case "storyboard":
+        return "text-purple-400 border-purple-500/30";
+      default:
+        return "text-gray-400 border-gray-500/30";
+    }
+  };
+
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case "character-concept":
+        return "👤";
+      case "environment":
+        return "🌍";
+      case "prop":
+        return "⚔️";
+      case "storyboard":
+        return "🎬";
+      default:
+        return "📦";
     }
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white mb-4">Image Generation</h2>
-
-      {/* Error Display */}
-      {error && (
-        <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 text-red-200">
-          {error}
+    <div className="bg-gray-900/50 border border-purple-500/30 rounded-lg overflow-hidden">
+      {/* Image Preview */}
+      {asset.imageUrl ? (
+        <div className="relative h-48 bg-gray-800">
+          <img
+            src={asset.imageUrl}
+            alt={asset.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+            <CheckCircle className="w-3 h-3" />
+            Generated
+          </div>
+        </div>
+      ) : (
+        <div className="h-48 bg-gray-800 flex items-center justify-center">
+          <ImageIcon className="w-16 h-16 text-gray-600" />
         </div>
       )}
 
-      {/* Current Generation Display */}
-      <div className="bg-gray-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl shadow-2xl p-6 flex flex-col md:flex-row gap-6">
-        <div className="md:w-1/2">
-          <h3 className="text-xl font-semibold text-purple-300 mb-3">
-            Generated Image
-          </h3>
-          <div className="aspect-video bg-gray-800/70 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
-            {isGenerating ? (
-              <div className="flex flex-col items-center gap-3">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
-                <span className="text-gray-400">Generating image...</span>
-              </div>
-            ) : generatedImage ? (
-              <img
-                src={generatedImage.imageUrl}
-                alt="Generated"
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <span className="text-gray-500">
-                Generated Image Will Appear Here
-              </span>
-            )}
-          </div>
-          {generatedImage && (
-            <>
-              <p className="text-sm text-gray-400">
-                Model: {generatedImage.model || "gemini-2.0-flash-exp"} | Aspect
-                Ratio: {aspectRatio} | Style: {stylePreset}
-              </p>
-              <p className="text-sm text-gray-400 mt-1">
-                Prompt: "{generatedImage.prompt}"
-              </p>
-              {generatedImage.text && (
-                <p className="text-xs text-gray-500 mt-1">
-                  AI Response: {generatedImage.text}
-                </p>
-              )}
-            </>
-          )}
-        </div>
-        <div className="md:w-1/2 flex flex-col justify-between">
-          <div>
-            <h3 className="text-xl font-semibold text-purple-300 mb-3">
-              Generate Parameters
-            </h3>
-            <div className="space-y-4">
-              {/* Prompt Input */}
-              <div>
-                <label
-                  htmlFor="promptInput"
-                  className="block text-sm font-medium text-gray-300 mb-1"
-                >
-                  Prompt *
-                </label>
-                <textarea
-                  id="promptInput"
-                  rows="3"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  className="w-full p-2 bg-gray-800/70 border border-gray-700 rounded-lg text-white text-sm focus:ring-purple-500 focus:border-purple-500"
-                  placeholder="e.g., A close-up portrait of a 1920s detective, weary eyes, fedora casting a shadow..."
-                ></textarea>
-              </div>
-              {/* Aspect Ratio */}
-              <div>
-                <label
-                  htmlFor="aspectRatio"
-                  className="block text-sm font-medium text-gray-300 mb-1"
-                >
-                  Aspect Ratio
-                </label>
-                <select
-                  id="aspectRatio"
-                  value={aspectRatio}
-                  onChange={(e) => setAspectRatio(e.target.value)}
-                  className="w-full p-2 bg-gray-800/70 border border-gray-700 rounded-lg text-white text-sm"
-                >
-                  <option>16:9 (Landscape)</option>
-                  <option>9:16 (Portrait)</option>
-                  <option>1:1 (Square)</option>
-                  <option>4:3 (Traditional)</option>
-                </select>
-              </div>
-              {/* Style Preset */}
-              <div>
-                <label
-                  htmlFor="stylePreset"
-                  className="block text-sm font-medium text-gray-300 mb-1"
-                >
-                  Style Preset
-                </label>
-                <select
-                  id="stylePreset"
-                  value={stylePreset}
-                  onChange={(e) => setStylePreset(e.target.value)}
-                  className="w-full p-2 bg-gray-800/70 border border-gray-700 rounded-lg text-white text-sm"
-                >
-                  <option>Film Noir</option>
-                  <option>Art Deco</option>
-                  <option>Gritty Realism</option>
-                  <option>Anime</option>
-                  <option>Fantasy Art</option>
-                  <option>Photorealistic</option>
-                </select>
-              </div>
-              {/* Negative Prompt */}
-              <div>
-                <label
-                  htmlFor="negativePrompt"
-                  className="block text-sm font-medium text-gray-300 mb-1"
-                >
-                  Negative Prompt (Optional)
-                </label>
-                <textarea
-                  id="negativePrompt"
-                  rows="2"
-                  value={negativePrompt}
-                  onChange={(e) => setNegativePrompt(e.target.value)}
-                  className="w-full p-2 bg-gray-800/70 border border-gray-700 rounded-lg text-white text-sm focus:ring-purple-500 focus:border-purple-500"
-                  placeholder="e.g., blurry, distorted, low quality, bad anatomy"
-                ></textarea>
-              </div>
-            </div>
-          </div>
-          {/* Generate Button */}
-          <button
-            onClick={handleGenerateImage}
-            disabled={isGenerating}
-            className={`mt-6 flex items-center justify-center gap-2 px-6 py-3 rounded-lg transition-colors font-semibold text-lg ${
-              isGenerating
-                ? "bg-gray-600 cursor-not-allowed"
-                : "bg-purple-600/80 hover:bg-purple-700 text-white"
-            }`}
+      {/* Card Content */}
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="text-white font-semibold truncate">{asset.name}</h4>
+          <span
+            className={`text-xs px-2 py-1 rounded border ${getTypeColor(
+              asset.type
+            )}`}
           >
-            {isGenerating ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                Generating...
-              </>
-            ) : (
-              <>
-                <ImageIcon className="w-6 h-6" /> Generate Image
-              </>
-            )}
+            {getTypeIcon(asset.type)} {asset.type}
+          </span>
+        </div>
+
+        {/* Prompt Preview */}
+        <div className="mb-4">
+          <p className="text-gray-400 text-sm line-clamp-3">
+            {showFullPrompt
+              ? asset.prompt
+              : asset.prompt.substring(0, 150) + "..."}
+          </p>
+          <button
+            onClick={() => setShowFullPrompt(!showFullPrompt)}
+            className="text-purple-400 text-xs mt-1 hover:underline"
+          >
+            {showFullPrompt ? "Show less" : "Show more"}
           </button>
         </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          {!asset.imageUrl && (
+            <button
+              onClick={handleGenerate}
+              disabled={generating || asset.status === "completed"}
+              className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+            >
+              {generating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Generate
+                </>
+              )}
+            </button>
+          )}
+          {asset.imageUrl && (
+            <a
+              href={asset.imageUrl}
+              download
+              className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+            >
+              <Download className="w-4 h-4" />
+              Download
+            </a>
+          )}
+        </div>
       </div>
-
-      {/* Gallery of Previous Generations */}
-      {generationHistory.length > 0 && (
-        <>
-          <h3 className="text-2xl font-bold text-white mt-8 mb-4">
-            Previous Generations
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {generationHistory.map((item, index) => (
-              <div
-                key={index}
-                className="bg-gray-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl shadow-2xl p-4"
-              >
-                <div className="aspect-video bg-gray-800/70 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
-                  <img
-                    src={item.imageUrl}
-                    alt={`Generation ${index + 1}`}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <h3
-                  className="text-lg font-semibold text-white truncate"
-                  title={item.prompt}
-                >
-                  {item.prompt.substring(0, 40)}...
-                </h3>
-                <p className="text-sm text-gray-400">
-                  Style: {item.stylePreset}
-                </p>
-                <div className="flex justify-end gap-2 mt-3">
-                  <button
-                    onClick={() => {
-                      setPrompt(item.prompt);
-                      setStylePreset(item.stylePreset);
-                      setAspectRatio(item.aspectRatio);
-                    }}
-                    className="p-2 bg-yellow-600/80 hover:bg-yellow-700 rounded-full text-white transition-colors"
-                    title="Use this prompt"
-                  >
-                    <RefreshIcon className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 bg-green-600/80 hover:bg-green-700 rounded-full text-white transition-colors">
-                    <CheckIcon className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* HITL Controls for the entire tab */}
-      <HITLControls />
     </div>
   );
 };
-
-const VideoStoryboardingTab = () => (
-  <div>
-    <h2 className="text-2xl font-bold text-white mb-4">
-      Video Storyboarding: 'Opening Scene'
-    </h2>
-    <div className="flex overflow-x-auto space-x-4 p-4 bg-gray-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl">
-      {[
-        { num: 1, desc: "EXT. CITY STREET - NIGHT" },
-        { num: 2, desc: "Rain hits pavement" },
-        { num: 3, desc: "Detective Harding arrives" },
-        { num: 4, desc: "CU - Harding lights cigarette" },
-        { num: 5, desc: "POV - Enters The Onyx Club" },
-      ].map((frame) => (
-        <div key={frame.num} className="flex-shrink-0 w-64">
-          <div className="aspect-video bg-gray-800/70 rounded-lg flex items-center justify-center mb-2">
-            <span className="text-gray-500">Frame {frame.num}</span>
-          </div>
-          <p className="text-sm text-white text-center">{frame.desc}</p>
-        </div>
-      ))}
-    </div>
-    <HITLControls />
-  </div>
-);
-
-const WorldLayoutTab = () => (
-  <div>
-    <h2 className="text-2xl font-bold text-white mb-4">
-      World Layout Viewer (Genie Integration)
-    </h2>
-    <div className="bg-gray-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl shadow-2xl p-6">
-      <div className="aspect-video bg-gray-800/70 rounded-lg flex items-center justify-center">
-        <p className="text-gray-500">Map / Grid-based display placeholder</p>
-      </div>
-    </div>
-    <HITLControls />
-  </div>
-);
 
 export default RenderPrepAgent;
