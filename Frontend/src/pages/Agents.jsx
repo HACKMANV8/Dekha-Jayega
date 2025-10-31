@@ -7,6 +7,7 @@ const Agents = () => {
   const [research, setResearch] = useState('No Research');
   const [filmLength, setFilmLength] = useState('90');
   const [numScenes, setNumScenes] = useState('12');
+  const [loading, isLoading] = useState(NULL);
 
   return (
     <>
