@@ -40,7 +40,7 @@ const HeroSection = () => {
         "-=0.8"
       );
 
-    // --- Floating animation for illustration ---
+    
     gsap.to(illustrationRef.current, {
       y: -20,
       duration: 3,
@@ -68,7 +68,7 @@ gsap.to(".hero-text", {
     start: "top top",
     end: "center center",
     scrub: 1,
-    markers: true,
+    // markers: true,
   },
 });
 

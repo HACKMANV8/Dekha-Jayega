@@ -9,11 +9,13 @@ const Navbar = () => {
  
   const NavLinks = () => (
     <>
-      <li><Link to="/agents" className="hover:text-gray-300">AGENTS</Link></li>
+      <li><Link to="/agents" className="hover:text-gray-300">SAGA AGENTS</Link></li>
+      <li><Link to="/renderprepagent" className="hover:text-gray-300">RENDERPREP AGENTS</Link></li>
       <li><Link to="/workflow" className="hover:text-gray-300">WORKFLOW</Link></li>
       <li><Link to="/dashboard" className="hover:text-gray-300">DASHBOARD</Link></li>
+      <li><Link to="/utility" className="hover:text-gray-300">UTILITY</Link></li>
       <li><Link to="/contactus" className="hover:text-gray-300">CONTACT US</Link></li>
-      <li><Link to="/signup" className="hover:text-gray-300">JOIN NOW</Link></li>
+      
     </>
   );
 

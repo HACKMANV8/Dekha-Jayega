@@ -5,8 +5,9 @@ import Agents from './pages/Agents'
 import Dashboard from './pages/Dashboard'
 import Workflow from './pages/Workflow'
 import ContactUs from './pages/ContactUs'
-import Login from './pages/Login'
 import Signup from './pages/SignUp'
+import RenderPrepAgent from './pages/RenderPrepAgent'
+import Utility from './pages/Utility'
 const App = () => {
   return (
     <div >
@@ -16,7 +17,8 @@ const App = () => {
         <Route path="/contactus" element={<ContactUs />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/workflow" element={<Workflow />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/renderprepagent" element={<RenderPrepAgent />} />
+        <Route path="/utility" element={<Utility />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
     </div>
