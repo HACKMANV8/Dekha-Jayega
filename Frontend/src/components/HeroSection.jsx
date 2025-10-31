@@ -40,7 +40,7 @@ const HeroSection = () => {
         "-=0.8"
       );
 
-    // --- Floating animation for illustration ---
+    
     gsap.to(illustrationRef.current, {
       y: -20,
       duration: 3,
@@ -61,28 +61,28 @@ gsap.set(".hero-text", {
 // --- Scale + blur (phase 1: scroll begins) ---
 gsap.to(".hero-text", {
   scale: 0.85,
-  filter: "blur(6px)",
+  filter: "blur(0px)",
   ease: "none",
   scrollTrigger: {
     trigger: "#hero",
     start: "top top",
     end: "center center",
     scrub: 1,
-    markers: true,
+    // markers: true,
   },
 });
 
 // --- Fade-out (phase 2: slow dissolve after scaling) ---
 gsap.to(".hero-text", {
   opacity: 0,
-  filter: "blur(5px)",
+  filter: "blur(0px)",
   ease: "none",
   scrollTrigger: {
     trigger: "#hero",
     start: "30%",
     end: "bottom top+=200",
     scrub: 1,
-    markers: true,
+    // markers: true,
   },
 });
 
@@ -104,7 +104,7 @@ gsap.to(".hero-text", {
     // --- Scale + blur hero text while scrolling down ---
     gsap.to([headingRef.current, subTextRef.current], {
       scale: 1.4, // enlarge
-      filter: "blur(6px)",
+      filter: "blur(0px)",
       transformOrigin: "center center",
       ease: "power2.out",
       scrollTrigger: {
@@ -170,20 +170,7 @@ gsap.to(".hero-text", {
                    blur-[120px] opacity-70"
       ></div>
 
-      {/* 🎬 “View Demo” Button */}
-      <div className="absolute top-1/2 right-4 z-20 -translate-y-1/2 md:right-12">
-        <button
-          ref={buttonRef}
-          className="group relative flex h-28 w-28 flex-col items-center justify-center rounded-full 
-                     border border-purple-500 text-purple-500 transition-all 
-                     hover:bg-purple-500 hover:text-white md:h-32 md:w-32"
-        >
-          <FaArrowRight className="text-3xl transition-transform group-hover:scale-110" />
-          <span className="mt-2 text-xs uppercase tracking-widest">
-            View Demo
-          </span>
-        </button>
-      </div>
+      
       
     </section>
   );
