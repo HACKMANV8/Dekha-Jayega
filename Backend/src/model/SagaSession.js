@@ -143,6 +143,17 @@ const sagaSessionSchema = new mongoose.Schema(
         createdAt: Date,
       },
     ],
+    // RenderPrep integration
+    renderPrepCompleted: {
+      type: Boolean,
+      default: false,
+    },
+    renderPrepAssets: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Asset",
+      },
+    ],
     // Configuration
     config: {
       model: String,

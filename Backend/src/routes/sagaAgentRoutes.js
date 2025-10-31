@@ -6,6 +6,7 @@ import {
   getSessionState,
   getProjectSessions,
   getAllActiveSessions,
+  getAllSessions,
   deleteSession,
 } from "../controller/sagaAgentController.js";
 
@@ -28,6 +29,9 @@ router.get("/project/:projectId/sessions", getProjectSessions);
 
 // Get all active sessions (for dashboard)
 router.get("/active", getAllActiveSessions);
+
+// Get all sessions (for RenderPrepAgent)
+router.get("/sessions", getAllSessions);
 
 // Delete a session
 router.delete("/session/:sessionId", deleteSession);

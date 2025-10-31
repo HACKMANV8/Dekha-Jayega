@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { FilmIcon } from "lucide-react";
 
@@ -11,6 +11,48 @@ const SagaAgent = () => {
   const [response, setResponse] = useState(null);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  // Load saved session on component mount
+  useEffect(() => {
+    const savedSessionId = localStorage.getItem("sagaAgentSessionId");
+    console.log("[SagaAgent] Checking for saved session ID:", savedSessionId);
+    if (savedSessionId) {
+      console.log("[SagaAgent] Loading saved session...");
+      loadSession(savedSessionId);
+    } else {
+      console.log("[SagaAgent] No saved session found, showing blank form");
+      setInitialLoading(false);
+    }
+  }, []);
+
+  // Save session ID when response changes
+  useEffect(() => {
+    if (response?.sessionId) {
+      localStorage.setItem("sagaAgentSessionId", response.sessionId);
+    }
+  }, [response]);
+
+  const loadSession = async (sessionId) => {
+    try {
+      setLoading(true);
+      const res = await fetch(
+        `${API_BASE_URL}/saga-agent/session/${sessionId}`
+      );
+      if (!res.ok) throw new Error("Session not found");
+      const data = await res.json();
+      if (data.success) {
+        setResponse(data.data);
+        setTopic(data.data.topic || "");
+      }
+    } catch (err) {
+      console.error("Failed to load session:", err);
+      localStorage.removeItem("sagaAgentSessionId");
+    } finally {
+      setLoading(false);
+      setInitialLoading(false);
+    }
+  };
 
   const handleStartSaga = async () => {
     if (!topic.trim()) {
@@ -130,8 +172,36 @@ const SagaAgent = () => {
     <>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-[#0a0e1a] via-[#0f1629] to-[#0a0e1a] text-white">
+        {/* Loading state on initial mount */}
+        {initialLoading && (
+          <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <svg
+                className="animate-spin h-12 w-12 text-purple-500 mx-auto mb-4"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              <p className="text-gray-400">Loading your saga...</p>
+            </div>
+          </div>
+        )}
+
         {/* Initial Input Screen */}
-        {!response && (
+        {!initialLoading && !response && (
           <div className="container mx-auto px-4 py-16">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
@@ -202,10 +272,27 @@ const SagaAgent = () => {
           <div className="min-h-screen flex flex-col">
             {/* Header */}
             <div className="bg-[#0f1629]/80 border-b border-slate-800/50 py-6">
-              <div className="container mx-auto px-4">
-                <h1 className="text-xl font-medium text-center text-gray-300">
+              <div className="container mx-auto px-4 flex justify-between items-center">
+                <h1 className="text-xl font-medium text-gray-300">
                   Manage and edit the AI-generated narrative
                 </h1>
+                <button
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Start a new saga? Your current progress is saved and can be viewed in RenderPrepAgent."
+                      )
+                    ) {
+                      localStorage.removeItem("sagaAgentSessionId");
+                      setResponse(null);
+                      setTopic("");
+                      setError(null);
+                    }
+                  }}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-all"
+                >
+                  New Saga
+                </button>
               </div>
             </div>
 

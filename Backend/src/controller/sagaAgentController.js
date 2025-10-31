@@ -548,6 +548,38 @@ export const getAllActiveSessions = async (req, res) => {
 };
 
 /**
+ * Get all saga sessions (for RenderPrepAgent)
+ */
+export const getAllSessions = async (req, res) => {
+  try {
+    const { status } = req.query;
+
+    const query = {};
+    if (status) {
+      query.status = status;
+    }
+
+    const sessions = await SagaSession.find(query)
+      .populate("projectId")
+      .sort({ createdAt: -1 })
+      .limit(100);
+
+    res.status(200).json({
+      success: true,
+      count: sessions.length,
+      data: sessions,
+    });
+  } catch (error) {
+    console.error("[SAGA ERROR] Get all sessions failed:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get sessions",
+      error: error.message,
+    });
+  }
+};
+
+/**
  * Delete a saga session
  */
 export const deleteSession = async (req, res) => {

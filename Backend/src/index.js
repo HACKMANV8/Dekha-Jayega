@@ -10,6 +10,7 @@ import renderPrepRoutes from "./routes/renderPrepRoutes.js";
 import assetRoutes from "./routes/assetRoutes.js";
 import imageGenerationRoutes from "./routes/imageGenerationRoutes.js";
 import sagaAgentRoutes from "./routes/sagaAgentRoutes.js";
+import renderPrepAgentRoutes from "./routes/renderPrepAgent.js";
 
 // Import middleware
 import {
@@ -47,6 +48,7 @@ app.use("/api/projects/:projectId/renderprep", renderPrepRoutes);
 app.use("/api/projects/:projectId/assets", assetRoutes);
 app.use("/api/image-generation", imageGenerationRoutes);
 app.use("/api/saga-agent", sagaAgentRoutes);
+app.use("/api/render-prep", renderPrepAgentRoutes);
 
 // Error handling middleware
 app.use(notFound);
