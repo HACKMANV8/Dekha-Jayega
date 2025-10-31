@@ -1,0 +1,72 @@
+# SagaEngine API Server Configuration
+# Copy this file to .env and fill in your API keys
+
+# === API Server Configuration ===
+API_HOST=0.0.0.0
+API_PORT=8001
+
+# === LLM API Keys ===
+# Provide at least one API key
+OPENAI_API_KEY=your_openai_api_key_here
+GOOGLE_API_KEY=your_google_api_key_here
+
+# === Model Configuration ===
+# Supervisor model (used for research-based concept generation)
+SUPERVISOR_MODEL=gemini-2.0-flash
+
+# Default model for all saga generation stages
+MODEL=gemini-2.0-flash
+
+# Model temperature (0.0 = deterministic, 1.0 = creative)
+MODEL_TEMPERATURE=0.7
+
+# Random seed for reproducibility (optional)
+# RANDOM_SEED=42
+
+# === Parallel Execution ===
+# Enable parallel generation (40-50% faster)
+PARALLEL_EXECUTION=true
+PARALLEL_MAX_WORKERS=3
+PARALLEL_BATCH_SIZE=4
+PARALLEL_RETRY_SEQUENTIAL=true
+
+# === Export Configuration ===
+EXPORT_DIR=SagaAgent/exports/
+CHECKPOINT_DB_PATH=SagaAgent/checkpoints.db
+
+# === Workflow Configuration ===
+# Auto-continue without human feedback (for parallel execution)
+AUTO_CONTINUE=false
+
+# Enable render prep stage
+ENABLE_RENDER_PREP=true
+
+# === Debug Configuration ===
+VERBOSE=false
+LIST_HISTORY=false
+
+# === Research Agent Configuration ===
+# Maximum tool call iterations for research
+MAX_TOOL_ITERATIONS=10
+
+# === Advanced Model Configuration ===
+# Comma-separated list of OpenAI models (optional)
+# OPENAI_MODELS=gpt-4,gpt-4-turbo,gpt-3.5-turbo
+
+# Comma-separated list of Google models (optional)
+# GOOGLE_MODELS=gemini-2.0-flash,gemini-1.5-pro,gemini-1.5-flash
+
+# Default OpenAI model (optional)
+# DEFAULT_OPENAI_MODEL=gpt-4
+
+# Default Google model (optional)
+# DEFAULT_GOOGLE_MODEL=gemini-2.0-flash
+
+# === Session Configuration ===
+# Thread ID for checkpoint persistence (optional)
+# THREAD_ID=my-saga-session
+
+# Resume from checkpoint (optional)
+# CHECKPOINT_ID=checkpoint-uuid-here
+
+
