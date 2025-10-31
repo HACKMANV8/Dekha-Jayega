@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar'
-import { TextIcon,ImageIcon,VideoIcon,MapIcon,CheckIcon,SendIcon } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { TextIcon, ImageIcon, VideoIcon, MapIcon, CheckIcon, SendIcon } from 'lucide-react';
 // --- INLINE SVG ICONS ---
-
 
 // Regenerate Icon
 const RefreshIcon = (props) => (
@@ -10,8 +9,6 @@ const RefreshIcon = (props) => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0 0v4.992m0 0h-4.992" />
   </svg>
 );
-
-
 
 const RenderPrepAgent = () => {
   const [activeTab, setActiveTab] = useState('Prompt Preview');
@@ -40,7 +37,7 @@ const RenderPrepAgent = () => {
 
   return (
     <>
-    <Navbar/>
+      <Navbar />
       {/* Main container with Hero styling */}
       <div className="min-h-screen bg-[#050505] text-white relative overflow-hidden">
         {/* Background glow (Copied from HeroSection) */}
@@ -137,22 +134,93 @@ const PromptPreviewTab = () => (
 );
 
 const ImageGenerationTab = () => (
-  <div>
-    <h2 className="text-2xl font-bold text-white mb-4">Image Generation Viewer</h2>
+  <div className="space-y-6">
+    <h2 className="text-2xl font-bold text-white mb-4">Image Generation</h2>
+
+    {/* Current Generation Display */}
+    <div className="bg-gray-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl shadow-2xl p-6 flex flex-col md:flex-row gap-6">
+      <div className="md:w-1/2">
+        <h3 className="text-xl font-semibold text-purple-300 mb-3">Latest Generation</h3>
+        <div className="aspect-video bg-gray-800/70 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
+          {/* Placeholder for the generated image */}
+          <span className="text-gray-500">Generated Image Here</span>
+        </div>
+        <p className="text-sm text-gray-400">Model: SDXL 1.0 | Style: Film Noir | Seed: 12345 | Time: 12.3s</p>
+        <p className="text-sm text-gray-400 mt-1">Prompt: "A close-up portrait of a 1920s detective, weary eyes, fedora casting a shadow, trench coat collar up, rain-slicked city street at night in the background, film noir style."</p>
+      </div>
+      <div className="md:w-1/2 flex flex-col justify-between">
+        <div>
+          <h3 className="text-xl font-semibold text-purple-300 mb-3">Adjust Parameters</h3>
+          <div className="space-y-4">
+            {/* Aspect Ratio */}
+            <div>
+              <label htmlFor="aspectRatio" className="block text-sm font-medium text-gray-300 mb-1">Aspect Ratio</label>
+              <select id="aspectRatio" className="w-full p-2 bg-gray-800/70 border border-gray-700 rounded-lg text-white text-sm">
+                <option>16:9 (Landscape)</option>
+                <option>9:16 (Portrait)</option>
+                <option>1:1 (Square)</option>
+                <option>4:3 (Traditional)</option>
+              </select>
+            </div>
+            {/* Style Preset */}
+            <div>
+              <label htmlFor="stylePreset" className="block text-sm font-medium text-gray-300 mb-1">Style Preset</label>
+              <select id="stylePreset" className="w-full p-2 bg-gray-800/70 border border-gray-700 rounded-lg text-white text-sm">
+                <option>Film Noir</option>
+                <option>Art Deco</option>
+                <option>Gritty Realism</option>
+                <option>Anime</option>
+              </select>
+            </div>
+            {/* Negative Prompt */}
+            <div>
+              <label htmlFor="negativePrompt" className="block text-sm font-medium text-gray-300 mb-1">Negative Prompt</label>
+              <textarea
+                id="negativePrompt"
+                rows="3"
+                className="w-full p-2 bg-gray-800/70 border border-gray-700 rounded-lg text-white text-sm focus:ring-purple-500 focus:border-purple-500"
+                placeholder="e.g., blurry, distorted, low quality, bad anatomy"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        {/* Generate Button */}
+        <button className="mt-6 flex items-center justify-center gap-2 px-6 py-3 bg-purple-600/80 text-white hover:bg-purple-700 rounded-lg transition-colors font-semibold text-lg">
+          <ImageIcon className="w-6 h-6" /> Generate Image
+        </button>
+      </div>
+    </div>
+
+    {/* Gallery of Previous Generations (Similar to your existing ImageGenerationTab) */}
+    <h3 className="text-2xl font-bold text-white mt-8 mb-4">Previous Generations</h3>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {[
-        'Detective Harding', 'The Onyx Club', 'Ancient Artifact',
-        'Rainy Street', 'Mob Boss Enzo', 'Warehouse Rendezvous'
-      ].map((name) => (
-        <div key={name} className="bg-gray-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl shadow-2xl p-4">
-          <div className="aspect-video bg-gray-800/70 rounded-lg flex items-center justify-center mb-3">
-            <span className="text-gray-500">Image Placeholder</span>
+        { name: 'Detective Harding (V1)', src: 'https://via.placeholder.com/400x225/333333/FFFFFF?text=Detective+Harding+V1' },
+        { name: 'The Onyx Club (V1)', src: 'https://via.placeholder.com/400x225/333333/FFFFFF?text=The+Onyx+Club+V1' },
+        { name: 'Ancient Artifact (V1)', src: 'https://via.placeholder.com/400x225/333333/FFFFFF?text=Ancient+Artifact+V1' },
+        { name: 'Rainy Street (V1)', src: 'https://via.placeholder.com/400x225/333333/FFFFFF?text=Rainy+Street+V1' },
+        { name: 'Mob Boss Enzo (V1)', src: 'https://via.placeholder.com/400x225/333333/FFFFFF?text=Mob+Boss+Enzo+V1' },
+        { name: 'Warehouse Rendezvous (V1)', src: 'https://via.placeholder.com/400x225/333333/FFFFFF?text=Warehouse+Rendezvous+V1' }
+      ].map((item) => (
+        <div key={item.name} className="bg-gray-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl shadow-2xl p-4">
+          <div className="aspect-video bg-gray-800/70 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
+            <img src={item.src} alt={item.name} className="w-full h-full object-cover" />
           </div>
-          <h3 className="text-lg font-semibold text-white">{name}</h3>
+          <h3 className="text-lg font-semibold text-white">{item.name}</h3>
           <p className="text-sm text-gray-400">Model: SDXL, Timestamp: ...</p>
+          <div className="flex justify-end gap-2 mt-3">
+            <button className="p-2 bg-yellow-600/80 hover:bg-yellow-700 rounded-full text-white transition-colors">
+              <RefreshIcon className="w-4 h-4" />
+            </button>
+            <button className="p-2 bg-green-600/80 hover:bg-green-700 rounded-full text-white transition-colors">
+              <CheckIcon className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       ))}
     </div>
+
+    {/* HITL Controls for the entire tab */}
     <HITLControls />
   </div>
 );
@@ -193,4 +261,3 @@ const WorldLayoutTab = () => (
 );
 
 export default RenderPrepAgent;
-
