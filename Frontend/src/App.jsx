@@ -3,7 +3,7 @@ import {Route,Routes} from 'react-router-dom'
 import Home from './pages/Home'
 import Agents from './pages/Agents'
 import Dashboard from './pages/Dashboard'
-import Workflow from './pages/Workflow'
+
 import ContactUs from './pages/ContactUs'
 import Signup from './pages/SignUp'
 import RenderPrepAgent from './pages/RenderPrepAgent'
@@ -16,7 +16,6 @@ const App = () => {
         <Route path="/agents" element={<Agents />} />
         <Route path="/contactus" element={<ContactUs />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/workflow" element={<Workflow />} />
         <Route path="/renderprepagent" element={<RenderPrepAgent />} />
         <Route path="/utility" element={<Utility />} />
         <Route path="/signup" element={<Signup />} />

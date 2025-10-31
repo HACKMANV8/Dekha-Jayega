@@ -61,7 +61,7 @@ gsap.set(".hero-text", {
 // --- Scale + blur (phase 1: scroll begins) ---
 gsap.to(".hero-text", {
   scale: 0.85,
-  filter: "blur(6px)",
+  filter: "blur(0px)",
   ease: "none",
   scrollTrigger: {
     trigger: "#hero",
@@ -75,14 +75,14 @@ gsap.to(".hero-text", {
 // --- Fade-out (phase 2: slow dissolve after scaling) ---
 gsap.to(".hero-text", {
   opacity: 0,
-  filter: "blur(5px)",
+  filter: "blur(0px)",
   ease: "none",
   scrollTrigger: {
     trigger: "#hero",
     start: "30%",
     end: "bottom top+=200",
     scrub: 1,
-    markers: true,
+    // markers: true,
   },
 });
 
@@ -104,7 +104,7 @@ gsap.to(".hero-text", {
     // --- Scale + blur hero text while scrolling down ---
     gsap.to([headingRef.current, subTextRef.current], {
       scale: 1.4, // enlarge
-      filter: "blur(6px)",
+      filter: "blur(0px)",
       transformOrigin: "center center",
       ease: "power2.out",
       scrollTrigger: {

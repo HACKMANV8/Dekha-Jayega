@@ -24,7 +24,7 @@ const VideoSection = () => {
       <div className="relative z-10 w-full flex-1 flex items-center justify-center px-10 pb-10 pt-10">
         <div className="relative w-full md:w-[80%] lg:w-[70%] rounded-[2rem] overflow-hidden bg-[#5a5563]/50 flex items-center justify-center">
           {/* Changed back to img tag since the src is a .png */}
-          <img
+          <video
             src="/showreel-preview.png"
             alt="Showreel Thumbnail"
             className="w-full h-auto opacity-80"
