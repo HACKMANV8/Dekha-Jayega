@@ -119,6 +119,30 @@ const SagaAgent = () => {
     }
   };
 
+  const handlePrevious = () => {
+    // Define the stage order
+    const stages = [
+      "concept",
+      "world_lore",
+      "factions",
+      "characters",
+      "plot_arcs",
+      "questlines",
+      "complete",
+    ];
+
+    const currentIndex = stages.indexOf(response.currentStage);
+    if (currentIndex > 0) {
+      // Go back to previous stage content
+      const previousStage = stages[currentIndex - 1];
+      setResponse({
+        ...response,
+        currentStage: previousStage,
+        awaitingFeedback: true,
+      });
+    }
+  };
+
   const handleSubmitFeedback = async () => {
     if (!response?.sessionId || !feedback.trim()) return;
     setLoading(true);
@@ -269,30 +293,32 @@ const SagaAgent = () => {
 
         {/* Workflow View */}
         {response && (
-          <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen flex flex-col pt-35">
             {/* Header */}
             <div className="bg-[#0f1629]/80 border-b border-slate-800/50 py-6">
-              <div className="container mx-auto px-4 flex justify-between items-center">
-                <h1 className="text-xl font-medium text-gray-300">
-                  Manage and edit the AI-generated narrative
-                </h1>
-                <button
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        "Start a new saga? Your current progress is saved and can be viewed in RenderPrepAgent."
-                      )
-                    ) {
-                      localStorage.removeItem("sagaAgentSessionId");
-                      setResponse(null);
-                      setTopic("");
-                      setError(null);
-                    }
-                  }}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-all"
-                >
-                  New Saga
-                </button>
+              <div className="container mx-auto px-4">
+                <div className="flex justify-between items-center gap-4">
+                  <h1 className="text-xl font-medium text-gray-300 flex-1">
+                    Manage and edit the AI-generated narrative
+                  </h1>
+                  <button
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Start a new saga? Your current progress is saved and can be viewed in RenderPrepAgent."
+                        )
+                      ) {
+                        localStorage.removeItem("sagaAgentSessionId");
+                        setResponse(null);
+                        setTopic("");
+                        setError(null);
+                      }
+                    }}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-all whitespace-nowrap flex-shrink-0"
+                  >
+                    New Saga
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -854,10 +880,11 @@ const SagaAgent = () => {
                   </div>
 
                   {/* Navigation Buttons */}
-                  <div className="flex items-center justify-between mt-6">
+                  <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-700/50">
                     <button
-                      disabled
-                      className="px-6 py-3 bg-slate-800/50 text-gray-500 rounded-lg font-semibold cursor-not-allowed flex items-center gap-2"
+                      onClick={handlePrevious}
+                      disabled={loading || stepInfo.current <= 1}
+                      className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
                     >
                       <svg
                         className="w-5 h-5"

@@ -267,6 +267,17 @@ export const generatePromptsFromSaga = async (req, res) => {
         // Store prompts as assets in MongoDB
         const assets = [];
 
+        // Check if assets already exist for this project and delete them to avoid duplicates
+        const existingAssets = await Asset.find({
+          projectId: sagaSession.projectId,
+        });
+        if (existingAssets.length > 0) {
+          console.log(
+            `[RENDER PREP] Found ${existingAssets.length} existing assets, deleting to avoid duplicates...`
+          );
+          await Asset.deleteMany({ projectId: sagaSession.projectId });
+        }
+
         // Store character prompts
         for (const charPrompt of prompts.character_prompts) {
           const asset = new Asset({
