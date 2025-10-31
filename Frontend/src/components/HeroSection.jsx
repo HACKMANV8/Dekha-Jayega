@@ -170,20 +170,7 @@ gsap.to(".hero-text", {
                    blur-[120px] opacity-70"
       ></div>
 
-      {/* 🎬 “View Demo” Button */}
-      <div className="absolute top-1/2 right-4 z-20 -translate-y-1/2 md:right-12">
-        <button
-          ref={buttonRef}
-          className="group relative flex h-28 w-28 flex-col items-center justify-center rounded-full 
-                     border border-purple-500 text-purple-500 transition-all 
-                     hover:bg-purple-500 hover:text-white md:h-32 md:w-32"
-        >
-          <FaArrowRight className="text-3xl transition-transform group-hover:scale-110" />
-          <span className="mt-2 text-xs uppercase tracking-widest">
-            View Demo
-          </span>
-        </button>
-      </div>
+      
       
     </section>
   );
