@@ -24,6 +24,7 @@ const RenderPrepAgent = () => {
   const [assets, setAssets] = useState([]);
   const [generatingImages, setGeneratingImages] = useState(false);
   const [qualityPreset, setQualityPreset] = useState("standard");
+  const [justGenerated, setJustGenerated] = useState(false); // Flag to prevent refetch after generation
 
   const tabs = [
     { name: "Prompt Preview", icon: TextIcon },
@@ -52,13 +53,32 @@ const RenderPrepAgent = () => {
 
   // Fetch assets when session changes
   useEffect(() => {
-    if (selectedSession) {
+    if (selectedSession && !justGenerated) {
+      console.log(
+        "[useEffect] Fetching assets for session change:",
+        selectedSession._id
+      );
       // Save selected session to localStorage
       localStorage.setItem("renderPrepSelectedSession", selectedSession._id);
       // Fetch existing assets for this session
       fetchAssetsForSession(selectedSession._id);
+    } else if (justGenerated) {
+      console.log("[useEffect] Skipping fetch - justGenerated is true");
     }
-  }, [selectedSession]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSession]); // justGenerated intentionally excluded to prevent refetch loop
+
+  // Separate effect to reset the flag
+  useEffect(() => {
+    if (justGenerated) {
+      console.log("[useEffect] Resetting justGenerated flag after delay");
+      const timer = setTimeout(() => {
+        setJustGenerated(false);
+        console.log("[useEffect] justGenerated flag reset to false");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [justGenerated]);
 
   const fetchSagaSessions = async () => {
     try {
@@ -171,6 +191,8 @@ const RenderPrepAgent = () => {
       );
 
       const data = await response.json();
+      console.log("[generatePrompts] Response data:", data);
+      console.log("[generatePrompts] Assets count:", data.data?.assets?.length);
 
       if (data.success) {
         // Backend now returns assets with all fields including _id/id
@@ -183,9 +205,13 @@ const RenderPrepAgent = () => {
           status: asset.status,
           metadata: asset.metadata,
         }));
+        console.log("[generatePrompts] Transformed assets:", transformedAssets);
+
+        // Set flag to prevent immediate refetch
+        setJustGenerated(true);
         setAssets(transformedAssets);
+
         // Switch to Image Generation tab
-        setActiveTab("Image Generation");
         setActiveTab("Image Generation");
       } else {
         setError(data.message || "Failed to generate prompts");
@@ -664,36 +690,38 @@ const AssetCard = ({ asset, onGenerate }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
-          {!asset.imageUrl && (
-            <button
-              onClick={handleGenerate}
-              disabled={generating || asset.status === "completed"}
-              className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
-            >
-              {generating ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  Generate
-                </>
-              )}
-            </button>
-          )}
-          {asset.imageUrl && (
-            <a
-              href={asset.imageUrl}
-              download
-              className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
-            >
-              <Download className="w-4 h-4" />
-              Download
-            </a>
-          )}
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-2">
+            {!asset.imageUrl && (
+              <button
+                onClick={handleGenerate}
+                disabled={generating || asset.status === "completed"}
+                className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+              >
+                {generating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Generate
+                  </>
+                )}
+              </button>
+            )}
+            {asset.imageUrl && (
+              <a
+                href={asset.imageUrl}
+                download
+                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+              >
+                <Download className="w-4 h-4" />
+                Download
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </div>

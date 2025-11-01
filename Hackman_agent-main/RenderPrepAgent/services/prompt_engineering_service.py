@@ -32,7 +32,8 @@ class PromptEngineeringService:
     
     NEGATIVE_UNWANTED = [
         "watermark", "signature", "text", "logo", "username",
-        "duplicate", "cropped", "out of frame"
+        "duplicate", "cropped", "out of frame", "cropped head", "cut off face",
+        "head out of frame", "top of head cut off", "incomplete head"
     ]
     
     # === Art Styles ===
@@ -141,14 +142,14 @@ class PromptEngineeringService:
         quality_preset = quality_preset or {"technical_details": "8K, sharp focus, professional", "emphasis_weight": 1.2}
         weight = quality_preset.get("emphasis_weight", 1.2)
         
-        # Determine image type based on art style
+        # Determine image type based on art style with proper framing
         style_lower = art_style.lower()
         if "photo" in style_lower or "realistic" in style_lower:
-            image_type = "portrait photograph"
+            image_type = "upper body portrait photograph, head to chest framing, full head visible"
         elif "3d" in style_lower or "render" in style_lower:
-            image_type = "3D character render"
+            image_type = "3D character render, upper body shot, complete head visible"
         else:
-            image_type = "character portrait"
+            image_type = "character portrait, upper body composition, full head and shoulders visible"
         
         # Build subject with emphasis
         subject = cls.apply_emphasis(f"{character_name}, {character_type}", weight)
