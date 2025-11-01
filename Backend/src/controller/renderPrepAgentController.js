@@ -86,7 +86,42 @@ export const generatePromptsFromSaga = async (req, res) => {
       __dirname,
       `../../../temp_saga_${sessionId}.json`
     );
-    const fs = await import("fs");
+    const { default: fs } = await import("fs");
+
+    // Clear old export files BEFORE creating temp file and running script
+    const exportPath = path.join(__dirname, "../../saga_exports/renders");
+    console.log("[RENDER PREP] Clearing old export files in:", exportPath);
+    try {
+      if (fs.existsSync(exportPath)) {
+        const oldFiles = fs.readdirSync(exportPath);
+        console.log(
+          "[RENDER PREP] Found old files to delete:",
+          oldFiles.length,
+          "files"
+        );
+        let deletedCount = 0;
+        for (const file of oldFiles) {
+          if (file.endsWith(".json")) {
+            const filePath = path.join(exportPath, file);
+            fs.unlinkSync(filePath);
+            deletedCount++;
+          }
+        }
+        console.log(`[RENDER PREP] Deleted ${deletedCount} old JSON files`);
+      } else {
+        console.log(
+          "[RENDER PREP] Export directory doesn't exist yet, will be created by Python script"
+        );
+      }
+    } catch (cleanError) {
+      console.warn(
+        "[RENDER PREP] Failed to clean old exports:",
+        cleanError.message
+      );
+      // Continue anyway - not critical
+    }
+
+    // Now create temp file
     fs.writeFileSync(tempDataPath, JSON.stringify(sagaData, null, 2));
     console.log("[RENDER PREP] Created temp file:", tempDataPath);
 
@@ -187,6 +222,7 @@ export const generatePromptsFromSaga = async (req, res) => {
           const characterFiles = files.filter(
             (f) => f.includes("characters_prompts") && f.endsWith(".json")
           );
+          console.log("[RENDER PREP] Character files found:", characterFiles);
           if (characterFiles.length > 0) {
             const latestCharFile = characterFiles.sort().reverse()[0];
             const characterPromptsPath = path.join(exportPath, latestCharFile);
@@ -198,6 +234,13 @@ export const generatePromptsFromSaga = async (req, res) => {
               fs.readFileSync(characterPromptsPath, "utf-8")
             );
             prompts.character_prompts = charData.prompts || [];
+            console.log(
+              "[RENDER PREP] Loaded",
+              prompts.character_prompts.length,
+              "character prompts"
+            );
+          } else {
+            console.warn("[RENDER PREP] No character prompts files found!");
           }
 
           // Find the most recent environment prompts file
@@ -267,19 +310,31 @@ export const generatePromptsFromSaga = async (req, res) => {
         // Store prompts as assets in MongoDB
         const assets = [];
 
-        // Check if assets already exist for this project and delete them to avoid duplicates
+        // Check if assets already exist for this SESSION (not project) and delete them to avoid duplicates
         const existingAssets = await Asset.find({
           projectId: sagaSession.projectId,
+          "metadata.sessionId": sessionId, // Filter by session ID
         });
         if (existingAssets.length > 0) {
           console.log(
-            `[RENDER PREP] Found ${existingAssets.length} existing assets, deleting to avoid duplicates...`
+            `[RENDER PREP] Found ${existingAssets.length} existing assets for this session, deleting to avoid duplicates...`
           );
-          await Asset.deleteMany({ projectId: sagaSession.projectId });
+          await Asset.deleteMany({
+            projectId: sagaSession.projectId,
+            "metadata.sessionId": sessionId,
+          });
         }
 
         // Store character prompts
         for (const charPrompt of prompts.character_prompts) {
+          console.log(`[RENDER PREP] Storing character: ${charPrompt.name}`);
+          console.log(
+            `[RENDER PREP] Prompt preview: ${charPrompt.positive_prompt?.substring(
+              0,
+              100
+            )}...`
+          );
+
           const asset = new Asset({
             projectId: sagaSession.projectId,
             name: charPrompt.name || "Character Asset",
@@ -294,6 +349,7 @@ export const generatePromptsFromSaga = async (req, res) => {
               resolution: "1024x1024",
               aspectRatio: "1:1",
               style: qualityPreset,
+              sessionId: sessionId, // Add session ID to metadata
               tags: [],
               sourceData: charPrompt,
             },
@@ -319,6 +375,7 @@ export const generatePromptsFromSaga = async (req, res) => {
               resolution: "1920x1080",
               aspectRatio: "16:9",
               style: qualityPreset,
+              sessionId: sessionId, // Add session ID
               tags: [],
               sourceData: envPrompt,
             },
@@ -344,6 +401,7 @@ export const generatePromptsFromSaga = async (req, res) => {
               resolution: "1024x1024",
               aspectRatio: "1:1",
               style: qualityPreset,
+              sessionId: sessionId, // Add session ID
               tags: [],
               sourceData: itemPrompt,
             },
@@ -369,6 +427,7 @@ export const generatePromptsFromSaga = async (req, res) => {
               resolution: "1920x1080",
               aspectRatio: "16:9",
               style: qualityPreset,
+              sessionId: sessionId, // Add session ID
               tags: [],
               sourceData: storyPrompt,
             },
@@ -552,18 +611,199 @@ export const generateImageFromAsset = async (req, res) => {
 };
 
 /**
- * Get all assets for a project
+ * Generate character voice introduction
+ */
+export const generateCharacterVoice = async (req, res) => {
+  try {
+    const { assetId } = req.params;
+
+    console.log("[VOICE GEN] Request for asset:", assetId);
+
+    // Find the asset
+    const asset = await Asset.findById(assetId);
+    if (!asset) {
+      return res.status(404).json({
+        success: false,
+        message: "Asset not found",
+      });
+    }
+
+    // Only generate voice for character assets
+    if (asset.type !== "character-concept") {
+      return res.status(400).json({
+        success: false,
+        message: "Voice generation is only available for character assets",
+      });
+    }
+
+    // Create character data for voice generation
+    const characterData = {
+      name: asset.name,
+      description: asset.prompts?.detailed || "",
+    };
+
+    // Create temporary JSON file for character data
+    const fs = await import("fs");
+    const tempCharPath = path.join(
+      __dirname,
+      `../../../temp_char_${assetId}.json`
+    );
+    const audioOutputPath = path.join(
+      __dirname,
+      `../../../public/voices/${assetId}.mp3`
+    );
+
+    // Ensure voices directory exists
+    const voicesDir = path.join(__dirname, "../../../public/voices");
+    if (!fs.existsSync(voicesDir)) {
+      fs.mkdirSync(voicesDir, { recursive: true });
+    }
+
+    fs.writeFileSync(tempCharPath, JSON.stringify(characterData, null, 2));
+
+    const PYTHON_PATH = process.env.PYTHON_PATH || "python";
+    const VOICE_SCRIPT = path.join(
+      __dirname,
+      "../../scripts/generate_character_voice.py"
+    );
+
+    console.log("[VOICE GEN] Spawning Python process...");
+    console.log("[VOICE GEN] Character:", asset.name);
+
+    const voiceProcess = spawn(PYTHON_PATH, [
+      VOICE_SCRIPT,
+      tempCharPath,
+      audioOutputPath,
+    ]);
+
+    let voiceData = "";
+    let errorData = "";
+
+    voiceProcess.stdout.on("data", (data) => {
+      voiceData += data.toString();
+    });
+
+    voiceProcess.stderr.on("data", (data) => {
+      errorData += data.toString();
+      console.error("[VOICE GEN] stderr:", data.toString());
+    });
+
+    voiceProcess.on("close", async (code) => {
+      // Cleanup temp file
+      try {
+        fs.unlinkSync(tempCharPath);
+      } catch (err) {
+        console.error("Failed to delete temp file:", err);
+      }
+
+      if (code !== 0) {
+        console.error("[VOICE GEN] Process failed with code:", code);
+        asset.voice = {
+          text: characterData.description.substring(0, 200),
+          voiceModel: "failed",
+          generatedAt: new Date(),
+        };
+        await asset.save();
+
+        return res.status(500).json({
+          success: false,
+          message: "Failed to generate voice",
+          error: errorData,
+        });
+      }
+
+      try {
+        console.log("[VOICE GEN] Parsing output...");
+        const result = JSON.parse(voiceData);
+        console.log("[VOICE GEN] Voice generated successfully");
+
+        // Update asset with voice data
+        asset.voice = {
+          audioUrl: result.audioBase64 || `/voices/${assetId}.mp3`,
+          text: result.text,
+          voiceModel: "gtts",
+          generatedAt: new Date(),
+          duration: result.duration,
+        };
+        await asset.save();
+
+        console.log("[VOICE GEN] Asset updated with voice data");
+        res.status(200).json({
+          success: true,
+          message: "Voice generated successfully",
+          data: {
+            assetId: asset._id,
+            audioUrl: asset.voice.audioUrl,
+            text: asset.voice.text,
+            name: asset.name,
+          },
+        });
+      } catch (parseError) {
+        console.error("Error parsing voice output:", parseError);
+        res.status(500).json({
+          success: false,
+          message: "Failed to parse voice generation output",
+          error: parseError.message,
+        });
+      }
+    });
+  } catch (error) {
+    console.error("Generate voice error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to generate voice",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Get all assets for a saga session
  */
 export const getProjectAssets = async (req, res) => {
   try {
-    const { projectId } = req.params;
+    const { projectId } = req.params; // This is actually sessionId from frontend
     const { type, status } = req.query;
 
-    const query = { projectId };
+    console.log("[GET ASSETS] ======================================");
+    console.log("[GET ASSETS] Request for sessionId:", projectId);
+
+    // Build query - search by metadata.sessionId since we're storing sessionId there
+    const query = { "metadata.sessionId": projectId };
     if (type) query.type = type;
     if (status) query.status = status;
 
+    console.log("[GET ASSETS] Query:", JSON.stringify(query));
     const assets = await Asset.find(query).sort({ createdAt: -1 });
+    console.log(
+      `[GET ASSETS] Found ${assets.length} assets for session:`,
+      projectId
+    );
+
+    // Debug: Log first asset metadata to verify structure
+    if (assets.length > 0) {
+      console.log(
+        "[GET ASSETS] Sample asset metadata:",
+        JSON.stringify(assets[0].metadata)
+      );
+      console.log(
+        "[GET ASSETS] Sample asset sessionId:",
+        assets[0].metadata?.sessionId
+      );
+    } else {
+      console.log("[GET ASSETS] No assets found - checking all assets...");
+      const allAssets = await Asset.find({}).limit(3);
+      console.log(`[GET ASSETS] Total assets in DB: ${allAssets.length}`);
+      if (allAssets.length > 0) {
+        console.log("[GET ASSETS] Sample asset from DB:", {
+          name: allAssets[0].name,
+          hasMetadata: !!allAssets[0].metadata,
+          sessionId: allAssets[0].metadata?.sessionId,
+          projectId: allAssets[0].projectId,
+        });
+      }
+    }
+    console.log("[GET ASSETS] ======================================");
 
     res.status(200).json({
       success: true,
