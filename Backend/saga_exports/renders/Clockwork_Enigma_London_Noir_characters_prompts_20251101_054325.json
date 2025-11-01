@@ -1,0 +1,56 @@
+{
+  "type": "characters",
+  "title": "Clockwork_Enigma_London_Noir",
+  "timestamp": "20251101_054325",
+  "count": 3,
+  "prompts": [
+    {
+      "id": "unknown_character",
+      "name": "Unknown Character",
+      "type": "NPC",
+      "positive_prompt": "character portrait, upper body composition, full head and shoulders visible, of, ((Unknown Character, NPC)), Elegant Victorian attire with subtle clockwork embellishments. Auburn (hair) pulled back in an intricate braid, revealing delicate gear-shaped earrings. Possesses a calculating gaze and nimble fingers stained with ink and grease., standing pose, confident stance, [neutral background:0.8], ((Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.)), soft natural lighting, rim light on edges, 8K, sharp focus, professional",
+      "negative_prompt": "blurry, low quality, low resolution, worst quality, grainy, pixelated, jpeg artifacts, out of focus, bad composition, extra limbs, extra fingers, missing fingers, poorly drawn hands, bad anatomy, extra arms, fused fingers, malformed limbs, poorly drawn face, distorted eyes, asymmetrical features, watermark, signature, text, logo, username, duplicate, cropped, out of frame, cropped head, cut off face, head out of frame, top of head cut off, incomplete head, multiple people, crowd, group",
+      "original_description": "Elegant Victorian attire with subtle clockwork embellishments. Auburn hair pulled back in an intricate braid, revealing delicate gear-shaped earrings. Possesses a calculating gaze and nimble fingers stained with ink and grease.",
+      "metadata": {
+        "character_type": "NPC",
+        "art_style": "Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.",
+        "quality_preset": "standard",
+        "role": "",
+        "personality": "",
+        "backstory_summary": ""
+      }
+    },
+    {
+      "id": "unknown_character",
+      "name": "Unknown Character",
+      "type": "NPC",
+      "positive_prompt": "character portrait, upper body composition, full head and shoulders visible, of, ((Unknown Character, NPC)), A woman in her late 20s, with a porcelain doll-like face framed by auburn curls. Her left arm is entirely replaced by a gleaming brass and Aetherium clockwork prosthetic, intricately designed with visible gears and delicate filigree. She often wears a high-collared, modified Victorian dress with subtle Aetherium wiring woven into the fabric., standing pose, confident stance, [neutral background:0.8], ((Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.)), soft natural lighting, rim light on edges, 8K, sharp focus, professional",
+      "negative_prompt": "blurry, low quality, low resolution, worst quality, grainy, pixelated, jpeg artifacts, out of focus, bad composition, extra limbs, extra fingers, missing fingers, poorly drawn hands, bad anatomy, extra arms, fused fingers, malformed limbs, poorly drawn face, distorted eyes, asymmetrical features, watermark, signature, text, logo, username, duplicate, cropped, out of frame, cropped head, cut off face, head out of frame, top of head cut off, incomplete head, multiple people, crowd, group",
+      "original_description": "A woman in her late 20s, with a porcelain doll-like face framed by auburn curls. Her left arm is entirely replaced by a gleaming brass and Aetherium clockwork prosthetic, intricately designed with visible gears and delicate filigree. She often wears a high-collared, modified Victorian dress with subtle Aetherium wiring woven into the fabric.",
+      "metadata": {
+        "character_type": "NPC",
+        "art_style": "Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.",
+        "quality_preset": "standard",
+        "role": "",
+        "personality": "",
+        "backstory_summary": ""
+      }
+    },
+    {
+      "id": "unknown_character",
+      "name": "Unknown Character",
+      "type": "NPC",
+      "positive_prompt": "character portrait, upper body composition, full head and shoulders visible, of, ((Unknown Character, NPC)), A wiry man in his late 60s with a shock of white (hair) perpetually askew. He sports thick spectacles perched precariously on his nose, often smudged with grease and ink. His tweed suit is patched and stained, but his (eyes) gleam with intellectual curiosity., standing pose, confident stance, [neutral background:0.8], ((Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.)), soft natural lighting, rim light on edges, 8K, sharp focus, professional",
+      "negative_prompt": "blurry, low quality, low resolution, worst quality, grainy, pixelated, jpeg artifacts, out of focus, bad composition, extra limbs, extra fingers, missing fingers, poorly drawn hands, bad anatomy, extra arms, fused fingers, malformed limbs, poorly drawn face, distorted eyes, asymmetrical features, watermark, signature, text, logo, username, duplicate, cropped, out of frame, cropped head, cut off face, head out of frame, top of head cut off, incomplete head, multiple people, crowd, group",
+      "original_description": "A wiry man in his late 60s with a shock of white hair perpetually askew. He sports thick spectacles perched precariously on his nose, often smudged with grease and ink. His tweed suit is patched and stained, but his eyes gleam with intellectual curiosity.",
+      "metadata": {
+        "character_type": "NPC",
+        "art_style": "Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.",
+        "quality_preset": "standard",
+        "role": "",
+        "personality": "",
+        "backstory_summary": ""
+      }
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+# ============================================================================
+# Project X - Comprehensive .gitignore
+# ============================================================================
+
+# === PYTHON ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# === VIRTUAL ENVIRONMENTS ===
+.venv/
+venv/
+ENV/
+env/
+.env
+.env.local
+.venv.bak
+.env.bak
+ENV.bak
+venv.bak
+
+# === IDE & EDITORS ===
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# === JUPYTER & NOTEBOOKS ===
+.ipynb_checkpoints/
+*.ipynb
+.jupyter/
+
+# === TESTING & COVERAGE ===
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+htmlcov/
+
+# === TYPE CHECKING ===
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# === DATABASES & CHECKPOINTS ===
+*.db
+*.sqlite
+*.sqlite3
+checkpoints.db
+*.checkpoint
+SagaAgent/checkpoints.db
+ArcueAgent/checkpoints.db
+
+# === PROJECT-SPECIFIC GENERATED FILES ===
+# SagaAgent outputs
+SagaAgent/exports/
+saga_concept.json
+saga_concept.md
+saga_world_lore.json
+saga_world_lore.md
+saga_factions.json
+saga_characters.json
+saga_plot_arcs.json
+saga_questlines.json
+
+# ArcueAgent outputs
+ArcueAgent/exports/
+generated_*.json
+generated_*.md
+
+# OrchestratorAgent outputs
+OrchestratorAgent/exports/
+
+# Research outputs
+Research/exports/
+research_*.json
+research_*.md
+
+# API server files
+api_logs/
+*.log
+
+# === RENDER PREP & VISUAL ASSETS ===
+render_prompts/
+visual_assets/
+*.veo
+*.genie
+
+# === CACHE & TEMPORARY ===
+.cache/
+*.tmp
+*.temp
+tmp/
+temp/
+
+# === OS-SPECIFIC ===
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
+Thumbs.db
+
+# === IDE-SPECIFIC ===
+# VS Code
+.code-workspace
+.vscode/launch.json
+.vscode/settings.json
+.vscode/extensions.json
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+.vim/
+Session.vim
+.viminfo
+
+# === BUILD & DIST ===
+build/
+dist/
+*.whl
+*.tar.gz
+
+# === DEPENDENCY LOCK FILES (optional, uncomment if using specific strategies) ===
+# poetry.lock
+# Pipfile.lock
+
+# === LOCAL CONFIGURATION ===
+.env.local
+.env.*.local
+config.local.py
+settings.local.py
+
+# === LARGE FILES ===
+# Models and large datasets
+*.pth
+*.pt
+*.onnx
+*.h5
+*.pb
+large_data/
+models/checkpoints/
+
+# === BACKUP & RECOVERY ===
+*.bak
+*.backup
+*.old
+*.swp
+*.swo
+*~
+*.orig
+
+# === OUTPUT DIRECTORIES ===
+output/
+outputs/
+results/
+logs/
+artifacts/
+
+# === LLM/API CACHE ===
+llm_cache/
+embedding_cache/
+.langchain_cache/
+
+# === PLATFORM-SPECIFIC ===
+# Windows
+*.lnk
+.lnk
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# === EDITOR BACKUP FILES ===
+*.*~
+*.bak
+*.tmp
+
+# === DOCUMENTATION BUILD ===
+docs/_build/
+site/
+
+# ============================================================================
+# EXCEPTIONS - Files/directories to ALWAYS track (use ! prefix)
+# ============================================================================
+
+# Keep empty directories
+!.gitkeep
+
+# Track essential config templates (without secrets)
+!.env.example
+!.env.template
+
+# Track important documentation
+!README.md
+!*.md
+
+# Track source code
+!*.py
+!*.ts
+!*.tsx
+!*.js
+!*.json
+!*.yaml
+!*.yml
+
+# ============================================================================
+# End of .gitignore
+# ============================================================================

@@ -1,0 +1,23 @@
+{
+  "type": "environments",
+  "title": "Clockwork_Enigma_London_Noir",
+  "timestamp": "20251101_054325",
+  "count": 1,
+  "prompts": [
+    {
+      "id": "aethelburg:_gears_of_albion_overview",
+      "name": "Aethelburg: Gears of Albion - World Overview",
+      "type": "World Landscape",
+      "positive_prompt": "environment concept art, of, ((World Landscape)), Aethelburg sprawls along the Thames, divided into districts: the industrial Clockwork Borough, the opulent Royal Quarter, the shadowy Gaslight District, and the academic University Ward. The river is , (((Magic))), clear day, (Epic fantasy world), ((Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.)), natural lighting, golden hour, soft shadows, 8K, sharp focus, professional, no people",
+      "negative_prompt": "blurry, low quality, low resolution, worst quality, grainy, pixelated, jpeg artifacts, out of focus, bad composition, watermark, signature, text, logo, username, duplicate, cropped, out of frame, cropped head, cut off face, head out of frame, top of head cut off, incomplete head, people, characters, humans, crowds, cluttered",
+      "original_description": "Aethelburg sprawls along the Thames, divided into districts: the industrial Clockwork Borough, the opulent Royal Quarter, the shadowy Gaslight District, and the academic University Ward. The river is choked with mechanical barges. Artificial hills, built from slag and discarded machinery, dot the landscape.",
+      "metadata": {
+        "location_type": "World Overview",
+        "art_style": "Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.",
+        "quality_preset": "standard",
+        "climate": "",
+        "atmosphere": "Epic fantasy world"
+      }
+    }
+  ]
+}

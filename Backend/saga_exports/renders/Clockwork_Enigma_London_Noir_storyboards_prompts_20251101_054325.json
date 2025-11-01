@@ -1,0 +1,81 @@
+{
+  "type": "storyboards",
+  "title": "Clockwork_Enigma_London_Noir",
+  "timestamp": "20251101_054325",
+  "count": 4,
+  "prompts": [
+    {
+      "id": "arc0_act1",
+      "name": "The Bellweather Conspiracy - Act 1 Opening",
+      "type": "Storyboard Frame",
+      "sequence_number": 1,
+      "positive_prompt": "cinematic scene, ((The Bellweather Conspiracy - Opening)), (((, , environment, atmosphere))), The game opens with the player, a novice clockwork engineer, discovering Professor Bellweather's abandoned workshop, filled with strange contraptions , (Wide establishing shot, cinematic framing), ((((Intriguing and mysterious)))), ((Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements., cinematic)), dramatic lighting, hard light, chiaroscuro, rim light, 8K, sharp focus, professional, wide shot, establishing shot, The dangers of unchecked technological advancement and the ethical responsibilities of inventors.",
+      "negative_prompt": "blurry, low quality, low resolution, worst quality, grainy, pixelated, jpeg artifacts, out of focus, bad composition, extra limbs, extra fingers, missing fingers, poorly drawn hands, bad anatomy, extra arms, fused fingers, malformed limbs, poorly drawn face, distorted eyes, asymmetrical features, watermark, signature, text, logo, username, duplicate, cropped, out of frame, cropped head, cut off face, head out of frame, top of head cut off, incomplete head, static, boring, flat lighting, poorly composed",
+      "original_description": "The game opens with the player, a novice clockwork engineer, discovering Professor Bellweather's abandoned workshop, filled with strange contraptions and cryptic notes. A frantic message from Bellweather hints at a conspiracy.",
+      "metadata": {
+        "arc_title": "The Bellweather Conspiracy",
+        "act": "Act 1",
+        "scene_type": "Opening",
+        "art_style": "Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.",
+        "quality_preset": "standard",
+        "characters": [
+          "",
+          ""
+        ],
+        "theme": "The dangers of unchecked technological advancement and the ethical responsibilities of inventors."
+      }
+    },
+    {
+      "id": "arc0_midpoint",
+      "name": "The Bellweather Conspiracy - Midpoint Twist",
+      "type": "Storyboard Frame",
+      "sequence_number": 2,
+      "positive_prompt": "cinematic scene, ((The Bellweather Conspiracy - Midpoint)), (((revelation, conflict, turning point))), The player learns that Lady Ada Lovelace (Augmented), a brilliant but controversial figure, is also investigating Bellweather's disappearance and may , (Dynamic angle, tension in framing), ((((Tense and dramatic)))), ((Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements., cinematic)), dramatic lighting, hard light, chiaroscuro, rim light, 8K, sharp focus, professional, wide shot, establishing shot, contrasting colors, dramatic lighting",
+      "negative_prompt": "blurry, low quality, low resolution, worst quality, grainy, pixelated, jpeg artifacts, out of focus, bad composition, extra limbs, extra fingers, missing fingers, poorly drawn hands, bad anatomy, extra arms, fused fingers, malformed limbs, poorly drawn face, distorted eyes, asymmetrical features, watermark, signature, text, logo, username, duplicate, cropped, out of frame, cropped head, cut off face, head out of frame, top of head cut off, incomplete head, static, boring, flat lighting, poorly composed",
+      "original_description": "The player learns that Lady Ada Lovelace (Augmented), a brilliant but controversial figure, is also investigating Bellweather's disappearance and may be either an ally or an enemy.",
+      "metadata": {
+        "arc_title": "The Bellweather Conspiracy",
+        "act": "Act 2",
+        "scene_type": "Midpoint",
+        "art_style": "Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.",
+        "quality_preset": "standard",
+        "theme": "The dangers of unchecked technological advancement and the ethical responsibilities of inventors."
+      }
+    },
+    {
+      "id": "arc0_climax",
+      "name": "The Bellweather Conspiracy - Climax",
+      "type": "Storyboard Frame",
+      "sequence_number": 3,
+      "positive_prompt": "cinematic scene, ((The Bellweather Conspiracy - Climax)), (((action, conflict, resolution, heroes))), The player infiltrates the Chronomasters' headquarters, battling clockwork automatons and augmented guards in a multi-stage assault., (Epic wide shot, heroic framing), ((((Epic and triumphant)))), ((Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements., cinematic)), dramatic lighting, hard light, chiaroscuro, rim light, 8K, sharp focus, professional, wide shot, establishing shot, vibrant, high contrast",
+      "negative_prompt": "blurry, low quality, low resolution, worst quality, grainy, pixelated, jpeg artifacts, out of focus, bad composition, extra limbs, extra fingers, missing fingers, poorly drawn hands, bad anatomy, extra arms, fused fingers, malformed limbs, poorly drawn face, distorted eyes, asymmetrical features, watermark, signature, text, logo, username, duplicate, cropped, out of frame, cropped head, cut off face, head out of frame, top of head cut off, incomplete head, static, boring, flat lighting, poorly composed",
+      "original_description": "The player infiltrates the Chronomasters' headquarters, battling clockwork automatons and augmented guards in a multi-stage assault.",
+      "metadata": {
+        "arc_title": "The Bellweather Conspiracy",
+        "act": "Act 3",
+        "scene_type": "Climax",
+        "art_style": "Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.",
+        "quality_preset": "standard",
+        "boss_mechanics": "The final boss is the leader of the Chronomasters, who wields the temporal device to manipulate time, creating distortions and reversing the player's actions.",
+        "theme": "The dangers of unchecked technological advancement and the ethical responsibilities of inventors."
+      }
+    },
+    {
+      "id": "arc0_resolution",
+      "name": "The Bellweather Conspiracy - Resolution",
+      "type": "Storyboard Frame",
+      "sequence_number": 4,
+      "positive_prompt": "cinematic scene, ((The Bellweather Conspiracy - Resolution)), (((characters, reflection, aftermath))), The epilogue reveals the long-term consequences of the player's actions, shaping the future of Aethelburg and its relationship with technology., (Peaceful composition, balance restored), ((((Hopeful and resolved)))), ((Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements., cinematic)), dramatic lighting, hard light, chiaroscuro, rim light, 8K, sharp focus, professional, wide shot, establishing shot, warm, balanced tones",
+      "negative_prompt": "blurry, low quality, low resolution, worst quality, grainy, pixelated, jpeg artifacts, out of focus, bad composition, extra limbs, extra fingers, missing fingers, poorly drawn hands, bad anatomy, extra arms, fused fingers, malformed limbs, poorly drawn face, distorted eyes, asymmetrical features, watermark, signature, text, logo, username, duplicate, cropped, out of frame, cropped head, cut off face, head out of frame, top of head cut off, incomplete head, static, boring, flat lighting, poorly composed",
+      "original_description": "The epilogue reveals the long-term consequences of the player's actions, shaping the future of Aethelburg and its relationship with technology.",
+      "metadata": {
+        "arc_title": "The Bellweather Conspiracy",
+        "act": "Act 3",
+        "scene_type": "Resolution",
+        "art_style": "Inspired by Dishonored and Thief, with a blend of Victorian architecture and steampunk technology. Dark, atmospheric lighting with pops of brass and copper. Character designs emphasize both elegance and mechanical enhancements.",
+        "quality_preset": "standard",
+        "theme": "The dangers of unchecked technological advancement and the ethical responsibilities of inventors."
+      }
+    }
+  ]
+}

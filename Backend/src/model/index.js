@@ -7,3 +7,4 @@ export { Location } from "./Location.js";
 export { PlotArc } from "./PlotArc.js";
 export { Quest } from "./Quest.js";
 export { Asset } from "./Asset.js";
+export { SagaSession } from "./SagaSession.js";

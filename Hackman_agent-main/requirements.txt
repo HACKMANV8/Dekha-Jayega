@@ -1,0 +1,14 @@
+dotenv
+langchain
+langchain-anthropic
+langchain-core
+langchain-google-genai
+langchain-openai
+tavily-python
+langgraph
+langgraph-cli
+langchain-google-vertexai
+fastapi
+uvicorn
+websockets
+httpx

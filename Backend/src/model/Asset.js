@@ -66,6 +66,13 @@ const assetSchema = new mongoose.Schema(
         cloudinaryId: String,
       },
     ],
+    voice: {
+      audioUrl: String,
+      text: String,
+      voiceModel: String,
+      generatedAt: Date,
+      duration: Number,
+    },
     videoSequence: {
       isSequence: {
         type: Boolean,

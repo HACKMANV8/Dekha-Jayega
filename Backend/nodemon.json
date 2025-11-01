@@ -1,0 +1,9 @@
+{
+  "watch": ["src"],
+  "ignore": [
+    "../Hackman_agent-main/saga_exports/**",
+    "../temp_saga_*.json",
+    "node_modules/**"
+  ],
+  "ext": "js,json"
+}
